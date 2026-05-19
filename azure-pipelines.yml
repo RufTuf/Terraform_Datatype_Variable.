@@ -1,0 +1,55 @@
+trigger:
+- main
+
+pool: default
+
+stages:
+  - stage: terraforminittoplan
+    displayName: terraform installation
+    jobs: 
+    - job: terraforminstall
+      steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+    - job: terrafrominit
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'hclsc'
+          backendAzureRmStorageAccountName: 'ztestg'
+          backendAzureRmContainerName: 'ztecon'
+          backendAzureRmKey: 'terraform.tfstate'
+    - job: terraformvalidate
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+    - job: terraformplan
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          environmentServiceNameAzureRM: 'hclsc'
+  - stage: 
+    displayName: manual validation
+    jobs:
+      - job: manualvalidation
+        steps:
+        - task: ManualValidation@1
+          inputs:
+            notifyUsers: 'nsn.kpil@gmail.com'
+            approvers: 'nsn.kapil@gmail.com'
+            instructions: 'pls approve'
+            onTimeout: 'resume'
+  - stage: 
+    displayName: sccaning
+    jobs:
+      - job: 
+        steps:
+        
+
